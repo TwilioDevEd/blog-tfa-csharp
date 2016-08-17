@@ -12,6 +12,7 @@ namespace TFA.Web.Models
         public string PhoneNumber { get; set; }
         public bool TwoFactor { get; set; }
         public bool BrowserRemembered { get; set; }
+        public bool IsGoogleAuthenticatorEnabled { get; set; }
     }
 
     public class ManageLoginsViewModel
@@ -23,6 +24,13 @@ namespace TFA.Web.Models
     public class FactorViewModel
     {
         public string Purpose { get; set; }
+    }
+
+    public class GoogleAuthenticatorViewModel
+    {
+        public string Code { get; set; }
+        public string SecretKey { get; set; }
+        public string BarcodeUrl { get; set; }
     }
 
     public class SetPasswordViewModel

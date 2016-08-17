@@ -3,9 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Base32;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using OtpSharp;
 using TFA.Web.Models;
 
 namespace TFA.Web.Controllers
@@ -63,15 +65,19 @@ namespace TFA.Web.Controllers
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
                 : "";
 
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
             var userId = User.Identity.GetUserId();
+
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
+                IsGoogleAuthenticatorEnabled = user.IsGoogleAuthenticatorEnabled
             };
+
             return View(model);
         }
 
@@ -321,6 +327,65 @@ namespace TFA.Web.Controllers
             var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
         }
+
+        public async Task<ActionResult> DisableGoogleAuthenticator()
+        {
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user != null)
+            {
+                user.IsGoogleAuthenticatorEnabled = false;
+                user.TOTPSecret = null;
+
+                await UserManager.UpdateAsync(user);
+
+                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+            }
+
+            return RedirectToAction("Index", "Manage");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> EnableGoogleAuthenticator()
+        {
+            var secretKey = KeyGeneration.GenerateRandomKey(20);
+            var userName = User.Identity.GetUserName();
+            var barcodeUrl = KeyUrl.GetTotpUrl(secretKey, userName);
+
+            var model = new GoogleAuthenticatorViewModel
+            {
+                SecretKey = Base32Encoder.Encode(secretKey),
+                BarcodeUrl = HttpUtility.UrlEncode(barcodeUrl)
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> EnableGoogleAuthenticator(GoogleAuthenticatorViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var secretKey = Base32Encoder.Decode(model.SecretKey);
+
+                long timeStepMatched;
+                var otp = new Totp(secretKey);
+                if (otp.VerifyTotp(model.Code, out timeStepMatched, new VerificationWindow(2, 2)))
+                {
+                    var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+                    user.IsGoogleAuthenticatorEnabled = true;
+                    user.TOTPSecret = model.SecretKey;
+                    await UserManager.UpdateAsync(user);
+
+                    return RedirectToAction("Index", "Manage");
+                }
+
+                ModelState.AddModelError("Code", "The Code is not valid");
+            }
+
+            return View(model);
+        }
+
+
 
         protected override void Dispose(bool disposing)
         {
