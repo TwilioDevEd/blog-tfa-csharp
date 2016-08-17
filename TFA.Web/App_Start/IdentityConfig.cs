@@ -8,6 +8,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using TFA.Web.Models;
 using TFA.Web.Providers;
+using Twilio;
 
 namespace TFA.Web
 {
@@ -22,10 +23,27 @@ namespace TFA.Web
 
     public class SmsService : IIdentityMessageService
     {
+        private readonly TwilioRestClient _client;
+
+        public SmsService()
+        {
+            _client = new TwilioRestClient(Config.TwilioAccountSID, Config.TwilioAuthToken);
+        }
+
+        public SmsService(TwilioRestClient client)
+        {
+            _client = client;
+        }
+
         public Task SendAsync(IdentityMessage message)
         {
-            // Plug in your SMS service here to send a text message.
-            return Task.FromResult(0);
+            var result = _client.SendMessage(
+                Config.TwilioNumber,
+                message.Destination,
+                message.Body
+            );
+
+            return Task.FromResult(result.Status == "queued");
         }
     }
 
