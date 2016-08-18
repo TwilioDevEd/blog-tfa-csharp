@@ -1,14 +1,24 @@
 ﻿@model TFA.Web.Models.GoogleAuthenticatorViewModel
 
+<div class="empty"></div>
 <div class="row">
-    <div class="col-md-8">
-        <h3>1\. Add MySuperApplication to Google Authenticator</h3>
-        <p>Open Google Authenticator and add MySuperApplication by scanning the QR Code to the right.</p>
-        <h3>2\. Enter the 6 digit code that Google Authenticator generates</h3>
-        <p>
-            Verify that MySuperApplication is added correctly in Google Authenticator by entering the 6 digit code which
-            Google Authenticator generates for MySuperApplication below, and then click Enable.
-        </p>
+    <div class="col-md-12">
+        <ol>
+            <li>
+                <a href="https://support.google.com/accounts/answer/1066447?hl=en"> Install Google Authenticator</a>
+                on your phone.
+            </li>
+            <li>Open the Google Authenticator app.</li>
+            <li>Tap menu, then tap "Set up account", then tap "Scan a barcode".</li>
+            <li>
+                Your phone will now be in a "scanning" mode. When you are in this mode, scan the barcode below:
+                <p>
+                    <img src="http://qrcode.kaywa.com/img.php?s=7&d=@(Model.BarcodeUrl)" alt="QR" />
+                </p>
+            </li>
+            <li>Once you have scanned the barcode, enter the 6-digit code below:</li>
+        </ol>
+
         @using (Html.BeginForm("EnableGoogleAuthenticator", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
             @Html.AntiForgeryToken()
@@ -27,8 +37,5 @@
                 </div>
             </div>
         }
-    </div>
-    <div class="col-md-4">
-        <img src="http://qrcode.kaywa.com/img.php?s=4&d=@(Model.BarcodeUrl)" />
     </div>
 </div>

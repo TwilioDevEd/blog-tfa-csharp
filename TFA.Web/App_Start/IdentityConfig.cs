@@ -91,7 +91,7 @@ namespace TFA.Web
                 Subject = "Security Code",
                 BodyFormat = "Your security code is {0}"
             });
-            manager.RegisterTwoFactorProvider("GoogleAuthenticator", new GoogleAuthenticatorTokenProvider());
+            manager.RegisterTwoFactorProvider("Google Authenticator", new GoogleAuthenticatorTokenProvider());
             manager.EmailService = new EmailService();
             manager.SmsService = new SmsService();
             var dataProtectionProvider = options.DataProtectionProvider;

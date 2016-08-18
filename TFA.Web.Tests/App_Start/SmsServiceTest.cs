@@ -6,6 +6,7 @@ using Twilio;
 
 namespace TFA.Web.Tests
 {
+    [TestFixture]
     public class SmsServiceTest
     {
         [Test]
