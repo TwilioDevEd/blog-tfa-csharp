@@ -21,16 +21,6 @@ This project is built using [ASP.NET MVC](http://www.asp.net/mvc) Framework.
    ```
 1. Build the solution.
 
-1. Create database and run migrations.
-
-   Make sure SQL Server is up and running.  
-   In Visual Studio, open the following command in the [Package Manager
-   Console](https://docs.nuget.org/consume/package-manager-console).
-
-   ```shell
-   Update-Database
-   ```
-
 1. Run the application.
 
 1. Check it out at [http://localhost:54360](http://localhost:54360).
