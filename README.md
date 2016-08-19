@@ -8,3 +8,35 @@
 
 This application will show you how to quickly add Two-Factor authentication to
 your website with Google Authenticator and Twilio SMS.
+
+## Local Development
+
+This project is built using [ASP.NET MVC](http://www.asp.net/mvc) Framework.
+
+1. First clone this repository and `cd` into it.
+
+   ```shell
+   git clone git@github.com:TwilioDevEd/blog-tfa-csharp.git
+   cd blog-tfa-csharp
+   ```
+1. Build the solution.
+
+1. Create database and run migrations.
+
+   Make sure SQL Server is up and running.  
+   In Visual Studio, open the following command in the [Package Manager
+   Console](https://docs.nuget.org/consume/package-manager-console).
+
+   ```shell
+   Update-Database
+   ```
+
+1. Run the application.
+
+1. Check it out at [http://localhost:54360](http://localhost:54360).
+
+## Meta
+
+* No warranty expressed or implied. Software is as is. Diggity.
+* [MIT License](http://www.opensource.org/licenses/mit-license.html)
+* Lovingly crafted by Twilio Developer Education.
